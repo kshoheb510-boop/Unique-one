@@ -14,8 +14,8 @@
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 // Replace these with your Supabase Project URL and Publishable key.
-const SUPABASE_URL='PASTE_YOUR_SUPABASE_PROJECT_URL_HERE';
-const SUPABASE_PUBLISHABLE_KEY='PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE';
+const SUPABASE_URL='https://hhbbkjwluhpxldjvarjd.supabase.co;
+const SUPABASE_PUBLISHABLE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhoYmJrandsdWhweGxkanZhcmpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE3NDMwODQsImV4cCI6MjEwNzMxOTA4NH0.ROs1DtXp4zX5XnQS02_LodDjcf2l-pCVWKncp1garEs;
 const $=id=>document.getElementById(id), status=(id,msg,kind='')=>{$(id).textContent=msg;$(id).className='status '+kind};
 const validConfig=SUPABASE_URL.startsWith('https://')&&!SUPABASE_URL.includes('PASTE_YOUR')&&SUPABASE_PUBLISHABLE_KEY&&!SUPABASE_PUBLISHABLE_KEY.includes('PASTE_YOUR');
 if(!validConfig){status('authStatus','Setup needed: add Supabase Project URL and Publishable Key to this file.','bad')}
