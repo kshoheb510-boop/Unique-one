@@ -22,7 +22,49 @@ if(!validConfig){status('authStatus','Setup needed: add Supabase Project URL and
 else{
 const sb=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);let user=null;
 function authUI(u){user=u||null;$('signedOut').classList.toggle('hidden',!!user);$('signedIn').classList.toggle('hidden',!user);$('userLabel').textContent=user?'Signed in as '+user.email:'';$('submitPromo').disabled=!user;if(user)mine();else $('myPromotions').innerHTML='<div class="status">Log in to view your submissions.</div>'}
-$('signupBtn').onclick=async()=>{const email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8)return status('authStatus','Enter an email and password with at least 8 characters.','bad');const {data,error}=await sb.auth.signUp({email,password});if(error)return status('authStatus',error.message,'bad');status('authStatus',data.session?'Account created.':'Account created. Check email to confirm, then log in.','good');if(data.session)authUI(data.user)};
+$('signupBtn').onclick = async () => {
+  try {
+    const email = $('email').value.trim();
+    const password = $('password').value;
+
+    if (!email || password.length < 8) {
+      return status(
+        'authStatus',
+        'Enter an email and password with at least 8 characters.',
+        'bad'
+      );
+    }
+
+    status('authStatus', 'Creating account...', 'good');
+
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password
+    });
+
+    if (error) {
+      return status('authStatus', error.message, 'bad');
+    }
+
+    status(
+      'authStatus',
+      data.session
+        ? 'Account created successfully!'
+        : 'Signup request sent. Check your email if confirmation is enabled.',
+      'good'
+    );
+
+    if (data.session) {
+      authUI(data.user);
+    }
+  } catch (error) {
+    status(
+      'authStatus',
+      'Error: ' + (error.message || 'Signup failed.'),
+      'bad'
+    );
+  }
+};
 $('loginBtn').onclick=async()=>{const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return status('authStatus',error.message,'bad');status('authStatus','Login successful.','good');authUI(data.user)};
 $('logoutBtn').onclick=async()=>{const {error}=await sb.auth.signOut();if(error)status('authStatus',error.message,'bad');else authUI(null)};
 $('promoForm').onsubmit=async e=>{e.preventDefault();if(!user)return status('promoStatus','Please log in first.','bad');let url;try{url=new URL($('linkUrl').value.trim());if(!['https:','http:'].includes(url.protocol))throw Error()}catch{return status('promoStatus','Enter a valid http/https link.','bad')}const amount=Number($('bidAmount').value);if(amount<99||!Number.isFinite(amount))return status('promoStatus','Minimum bid is ₹99.','bad');$('submitPromo').disabled=true;const {error}=await sb.from('promotions').insert({user_id:user.id,platform:$('platform').value,link_url:url.href,bid_amount:amount,status:'pending'});$('submitPromo').disabled=false;if(error)return status('promoStatus','Could not submit: '+error.message,'bad');$('linkUrl').value='';status('promoStatus','Submitted for review. No payment was taken.','good');mine()};
